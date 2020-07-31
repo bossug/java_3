@@ -3,9 +3,24 @@ package com.company;
 public class Mfu {
     public static void main(String[] args) {
         MFU mfu = new MFU();
-        new Thread(() -> mfu.scan("A", 4)).start();
-        new Thread(() -> mfu.print("A", 5)).start();
-        new Thread(() -> mfu.xerox("B", 7)).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mfu.scan("A", 4);
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mfu.print("В", 5);
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mfu.xerox("С", 7);
+            }
+        }).start();
     }
     static class MFU {
         Object scan = new Object();
@@ -28,17 +43,18 @@ public class Mfu {
             System.out.println("================================");
         }
         public void scan(String doc, int n){
-            System.out.println("Начинается сканирование документа: " + doc);
-            System.out.println("--------------------------");
+            synchronized (scan) {
+                System.out.println("Начинается сканирование документа: " + doc);
+                System.out.println("--------------------------");
                 for (int i = 0; i < n; i++) {
-                    System.out.println("Страница "+i+" документа " + doc + " сканируется...");
+                    System.out.println("Страница " + i + " документа " + doc + " отсканирована...");
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-            System.out.println("Сканирование документа " + doc + " завершено.");
+            }
             System.out.println("================================");
         }
         public void xerox(String doc, int n){
@@ -46,12 +62,13 @@ public class Mfu {
                 System.out.println("Ксерокопия документа: " + doc);
                 System.out.println("--------------------------");
                 for (int i = 0; i < n; i++) {
-                    System.out.println("Страница " + i + " документа " + doc + " напечатана...");
+                    System.out.println("Страница " + i + " ксерокса " + doc + " печатается...");
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    System.out.println("Страница " + i + " ксерокса " + doc + " напечатана...");
                 }
             }
             System.out.println("Ксеорокопия документа " + doc + " завершено.");
